@@ -1,71 +1,132 @@
-# 🌐 Portfólio — Frontend
+# ⚙️ Portfólio — Backend
 
-Landing page pessoal desenvolvida com HTML, CSS e JavaScript puro, com foco em design limpo, responsividade e integração com API REST.
-
-🔗 **Acesse:** [gustavo-nicoliche.vercel.app](https://gustavo-nicoliche.vercel.app)
-
------
-
-## 📸 Visão Geral
-
-Site de portfólio pessoal desenvolvido do zero, sem frameworks frontend, apresentando minhas habilidades, projetos e formas de contato.
+API REST desenvolvida com Java e Spring Boot, responsável por receber os dados do formulário de contato, salvar no banco de dados e enviar notificação por e-mail.
 
 -----
 
 ## 🚀 Tecnologias
 
-- **HTML5** — estrutura semântica
-- **CSS3** — design system com variáveis, animações e responsividade
-- **JavaScript** — interatividade, validação de formulário e integração com API
-- **Lucide Icons** — biblioteca de ícones SVG
-- **Google Fonts** — tipografia (DM Serif Display + DM Sans)
+- **Java 21**
+- **Spring Boot 3.5**
+- **Spring Web** — endpoints REST
+- **Spring Data JPA** — acesso ao banco de dados
+- **Spring Validation** — validação dos dados recebidos
+- **PostgreSQL** — banco de dados relacional
+- **Resend** — envio de e-mails transacionais
+- **Maven** — gerenciador de dependências
 
 -----
 
 ## ✨ Funcionalidades
 
-- Layout responsivo (mobile, tablet e desktop)
-- Animações de entrada com Intersection Observer
-- Menu hambúrguer para mobile
-- Formulário de contato integrado à API REST
-- Botão flutuante de WhatsApp
-- Scroll suave entre seções
-- Seção de projetos pronta para receber cards com screenshot e link para GitHub
+- Endpoint `POST /api/contato` para receber mensagens do formulário
+- Validação dos campos no backend (`@NotBlank`, `@Email`, `@Size`)
+- Persistência dos contatos no PostgreSQL
+- Notificação por e-mail ao receber novo contato (via Resend)
+- CORS configurado para aceitar requisições do frontend
 
 -----
 
 ## 📁 Estrutura do Projeto
 
 ```
-portfolio/
-├── index.html        # Estrutura HTML semântica
-├── css/
-│   └── style.css     # Design system, layout e responsividade
-└── js/
-    └── main.js       # Interatividade e integração com API
+src/main/java/portfolio/
+├── controller/
+│   └── ContatoController.java   # Endpoints REST
+├── service/
+│   ├── ContatoService.java      # Regras de negócio
+│   └── EmailService.java        # Envio de e-mail
+├── repository/
+│   └── ContatoRepository.java   # Acesso ao banco
+├── model/
+│   └── Contato.java             # Entidade JPA
+└── PortfolioApplication.java    # Ponto de entrada
 ```
 
 -----
 
-## 🔌 Integração com Backend
+## 🔌 Endpoint
 
-O formulário de contato envia os dados via `fetch()` para a API REST:
+### `POST /api/contato`
 
-```javascript
-fetch('https://portfolio-backend-production-0cbc.up.railway.app/api/contato', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ nome, email, assunto, mensagem })
-});
+Recebe os dados do formulário de contato.
+
+**Request body:**
+
+```json
+{
+  "nome": "João Silva",
+  "email": "joao@email.com",
+  "assunto": "proposta",
+  "mensagem": "Olá, tenho uma proposta de trabalho!"
+}
+```
+
+**Response (201 Created):**
+
+```json
+{
+  "id": 1,
+  "nome": "João Silva",
+  "email": "joao@email.com",
+  "assunto": "proposta",
+  "mensagem": "Olá, tenho uma proposta de trabalho!",
+  "criadoEm": "2026-04-05T02:26:33.764654427"
+}
+```
+
+-----
+
+## ⚙️ Variáveis de Ambiente
+
+|Variável                       |Descrição                                   |
+|-------------------------------|--------------------------------------------|
+|`SPRING_DATASOURCE_URL`        |URL de conexão com o PostgreSQL             |
+|`SPRING_DATASOURCE_USERNAME`   |Usuário do banco                            |
+|`SPRING_DATASOURCE_PASSWORD`   |Senha do banco                              |
+|`SPRING_JPA_HIBERNATE_DDL_AUTO`|Estratégia do Hibernate (`update`)          |
+|`SERVER_PORT`                  |Porta do servidor                           |
+|`RESEND_API_KEY`               |Chave da API do Resend para envio de e-mails|
+
+-----
+
+## 🖥️ Rodando Localmente
+
+**Pré-requisitos:** Java 21, Maven, PostgreSQL
+
+1. Clone o repositório:
+
+```bash
+git clone https://github.com/Gustavo-Nicoliche/portfolio-backend.git
+```
+
+1. Configure o `application.properties` com suas credenciais locais.
+1. Rode a aplicação:
+
+```bash
+./mvnw spring-boot:run
+```
+
+1. Teste o endpoint:
+
+```bash
+curl -X POST http://localhost:8080/api/contato \
+  -H "Content-Type: application/json" \
+  -d '{
+    "nome": "Teste",
+    "email": "teste@email.com",
+    "assunto": "proposta",
+    "mensagem": "Testando a API!"
+  }'
 ```
 
 -----
 
 ## 📦 Deploy
 
-Hospedado na **Vercel** com deploy contínuo via GitHub.
+Hospedado no **Railway** com deploy contínuo via GitHub.
 
-Toda vez que um `push` é feito na branch `main`, o Vercel faz o deploy automaticamente.
+Toda vez que um `push` é feito na branch `main`, o Railway faz o build e deploy automaticamente.
 
 -----
 
