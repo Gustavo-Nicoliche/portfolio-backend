@@ -4,27 +4,26 @@ import org.springframework.stereotype.Service;
 import portfolio.model.Contato;
 import portfolio.repository.ContatoRepository;
 
-// @Service → marca esta classe como componente de serviço
-// O Spring a gerencia automaticamente (injeção de dependência)
 @Service
 public class ContatoService {
 
-    // Injeção de dependência:
-    // O Spring injeta automaticamente uma instância do Repository
-    // Não precisamos fazer "new ContatoRepository()" manualmente
     private final ContatoRepository contatoRepository;
+    private final EmailService emailService;
 
-    // Injeção via construtor (forma recomendada)
-    public ContatoService(ContatoRepository contatoRepository) {
+    // Injeta os dois serviços via construtor
+    public ContatoService(ContatoRepository contatoRepository, EmailService emailService) {
         this.contatoRepository = contatoRepository;
+        this.emailService = emailService;
     }
 
-    /**
-     * Salva um novo contato no banco de dados.
-     * @param contato → objeto recebido do Controller
-     * @return o contato salvo (com ID e criadoEm preenchidos)
-     */
     public Contato salvar(Contato contato) {
-        return contatoRepository.save(contato);
+        // 1. Salva no banco
+        Contato salvo = contatoRepository.save(contato);
+
+        // 2. Envia notificação por e-mail
+        // (em thread separada para não atrasar a resposta ao frontend)
+        new Thread(() -> emailService.enviarNotificacao(salvo)).start();
+
+        return salvo;
     }
 }
